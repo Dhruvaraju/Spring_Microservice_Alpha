@@ -123,3 +123,57 @@ Learning Microservices with Spring and Spring boot
 		.getResponseBody().getMessage().equalsIgnoreCase("Hi There");
 	}
 ```
+
+### Reactive Streams
+- Reactive stream specification has implementations of four interfaces they are as follows
+
+#### Publisher
+- A publisher holds the source of data.
+- Publishes data at the request of subscriber.
+- A subscriber can then attach a subscription on the publisher.
+
+> Subscribe method is just a registration method, will not return any result.
+
+```
+public Interface Publisher<T>{
+    public void subscribe(Subscriber<? super T> s);
+}
+```
+#### Subscriber
+- Subscriber subscribe to a publisher for consuming streams of data.
+- It defines a set of call back methods which will be called up on those events.
+> OnComplete is when everything is done and successful.
+> All the below mentioned methods are call back methods and they do not  respond with any data
+
+```
+    public interface Subscriber<T> {
+        public void onSubscribe(Subscription s);
+        public void onNext(T t);
+        public void onError(Throwable t);
+        public void onComplete();
+    }
+```
+#### Subscription
+- Subscription is shared by exactly one publisher and one subscriber for the purpose of data mediation between these pair.
+> Data exchange happens when the subscriber calls request method.
+> To stop subscription cancel method is invoked.
+
+```
+    public interface Subscription {
+        public void request(long n);
+        public void cancel();
+    }
+```
+#### Processor
+- A processor represents a processing stage which is both a subscriber and publisher, It should obey the contracts of both.
+- This can be chained by connecting a publisher and subscriber.
+```
+public interface Processor<T, R> extends Subscriber<T>, Publisher<R> {
+}
+```
+
+### Reactor
+- Reactor has two implementations for publisher
+    - Flux: Can emit (0...n) events
+    - Mono: Can emit (0..1) event
+> Flux is required when many data elements or a list of values is transmitted as streams.
