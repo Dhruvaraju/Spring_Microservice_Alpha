@@ -73,3 +73,53 @@ Learning Microservices with Spring and Spring boot
 - Example HATEOAS project is attached.
 - To access HAL browser navigate to ``` /browser/index.html ``` URI.
 - for the  attached project ``` http://localhost:9000/browser/index.html ```
+
+### Reactive Microservices
+- Combines reactive programming paradigm with Microservice architecture.
+- Reactive software are
+    - Responsive : Responsive systems focus on providing rapid and consistent response times, establishing reliable upper bounds so they deliver a consistent quality of service.
+    - Resilient: The system stays responsive in the face of failure. This applies not only to highly-available, mission-critical systems — any system that is not resilient will be unresponsive after a failure. Resilience is achieved by replication, containment, isolation and delegation.
+    - Elastic: The system stays responsive under varying workload. Reactive Systems can react to changes in the input rate by increasing or decreasing the resources allocated to service these inputs.
+    - Message Driven: Reactive Systems rely on asynchronous message-passing to establish a boundary between components that ensures loose coupling, isolation and location transparency.
+- A highly reliable and scalable message system is the single most important component in a reactive microservice ecosystem.
+- QBit, Spring Reactive, RxJava and RxJS are some of the frameworks and libraries to build reactive microservices.
+- Example use case of reactive microservice: Order management system. On placing a an order an event will be triggered, Which will initiate series of services like check inventory, replenish stock, confirm payment, initiate packing, Initiate shipping.
+
+### Spring Webflux
+- Webflux is used to implement reactive microservices in spring, It can be implemented in 2 ways
+    - using @Controller and other annotations in spring boot
+    - Functional programming using java8 lambda style.
+### Building reactive MS using annotation style
+- Create a new spring maven project by selecting only Web >> Spring reactive web >> Generate project
+- Instead of spring starter ``` spring-boot-starter-webflux ``` will be available in POM.
+- Using the same controller and objects as used earlier.
+- Instead of returning a list we will return a Construct Mono.
+
+### Mono Construct
+- This allows the spring for reactive programming 
+```
+@GetMapping("/")
+	public Mono<Greet> displayMessage() {
+		return Mono.just(new Greet("Hi There"));
+	}
+```
+- In the above example the Greet object will be serialized only when Mono is completed in asynchronous non-blocking mode.
+- Use of mono will create a single definitive item. Here Mono is used to declare a logic which will get executed as soon as the object is de-serialized.
+- If in case Mono is sent as a parameter to a controller method, it may be executed even before the serialization gets over. The code in the controller will let us know what we need to do with Mono object. Alternative to Mono we can use Flex.
+
+### Writing test for Mono
+- We will use web-environment with defined port instead of random port.
+- WebTestClient is used to create a server and bind with a base URL to it.
+
+```
+	@Test
+	public void testWebFluxURI() throws Exception {
+		WebTestClient webClient = WebTestClient.bindToServer().baseUrl("http://localhost:8080").build();
+		webClient.get().uri("/")
+		.accept(org.springframework.http.MediaType.APPLICATION_JSON)
+		.exchange()
+		.expectStatus().isOk()
+		.expectBody(Greet.class).returnResult()
+		.getResponseBody().getMessage().equalsIgnoreCase("Hi There");
+	}
+```
