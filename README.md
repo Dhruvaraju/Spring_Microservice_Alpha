@@ -60,7 +60,7 @@ Learning Microservices with Spring and Spring boot
 > From STS open Junit view and click on run test.
 
 ### HATEOAS (Hyper Media As The Engine Of Application State)
-- Useful for building conversational style microservices which exibit strong affinity between UI and its backend services.
+- Useful for building conversational style microservices which exhibit strong affinity between UI and its backend services.
 - HATEOAS is a REST service pattern in which navigation links are provided as part of payload metadata.
 - Useful methodology for responsive mobile and web applications, where client downloads additional data based on user navigation pattern.
 
@@ -177,3 +177,60 @@ public interface Processor<T, R> extends Subscriber<T>, Publisher<R> {
     - Flux: Can emit (0...n) events
     - Mono: Can emit (0..1) event
 > Flux is required when many data elements or a list of values is transmitted as streams.
+
+### Reactive MS using SpringBoot and Rabbit MQ
+- Download rabbit MQ and install it as specified in the site: https://www.rabbitmq.com/download.html
+- For installing rabbit MQ erlang is also required so install the same.
+> RabbitMQ runs on port 5672 by default, User name and password will be guest.
+- To create a event driven messaging project choose Messaging >> Spring RabbitMQ >> generate project
+- RabbitMQ need to be configured in Application properties as below
+
+```
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=guest
+spring.rabbitmq.password=guest
+server.port=9090
+```
+- Now we need to define sender and receiver components
+> Complete code is available in attached SpringRabbitMQ project
+- Sender should initiate a Queue, RabbitMQMessagingTemplate and send methods to send messages.
+
+```
+@Autowired
+	RabbitMessagingTemplate template;
+	
+	@Bean
+	Queue queue() {
+		return new Queue("TestQ", false);
+	}
+	
+	public void send(String message) {
+		template.convertAndSend("TestQ",message);
+	}
+```
+- Receiver is initiated to have a RabbitListener
+```
+@RabbitListener(queues = "TestQ")
+	public void processMessage(String content) {
+	
+		System.out.println(content);
+	}
+```
+- To initiate this message queue we need to implement the CommandLineRunner interface on the application file.
+- Auto-wire your sender and implement the run method to invoke sender.send method, which will post a message to the queue.
+```
+@SpringBootApplication
+public class SpringRabbitMqApplication implements CommandLineRunner {
+	@Autowired
+	Sender sender;
+	public static void main(String[] args) {
+		SpringApplication.run(SpringRabbitMqApplication.class, args);
+	}
+	
+	public void run(String... args) throws Exception {
+		sender.send("Messaging from App...!!!!");
+	}
+
+}
+```
