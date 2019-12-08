@@ -234,3 +234,17 @@ public class SpringRabbitMqApplication implements CommandLineRunner {
 
 }
 ```
+### Implementing Spring Security on an application
+- Creating a project: Select web // Web and Security / Spring Security
+- POM will have a new entry ``` <artifactId>spring-boot-starter-security</artifactId>  ```
+- Use the same get mapping as earlier projects, run the application.
+- While accessing the application through browser it will ask for user name and password.
+> Default username is **user** the default password will be available in console while starting the application.
+- Username and password can be configured in properties file as well.
+```
+//This is an application.properties entry
+spring.security.user.name=delta
+spring.security.user.password=alpha
+```
+- Securing microservices is necessary when multiple microservices are interacting with each other.
+- Spring provides security with no added overhead. 
