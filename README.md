@@ -247,4 +247,26 @@ spring.security.user.name=delta
 spring.security.user.password=alpha
 ```
 - Securing microservices is necessary when multiple microservices are interacting with each other.
-- Spring provides security with no added overhead. 
+- Spring provides security with no added overhead.
+
+### Securing microservices with OAuth2
+- Entities involved in OAuth are Client, Resource Owner, Authorization Server, Resource.
+- Resource is a protected API.
+- The owner of this API is considered as resource owner.
+- Client is the one who needs the resource for performing a business function.
+- Authorization server Validates the access keys and let the client use the resource.
+- Access key or authentication token is an encrypted key which the authorization server verify to provide access to resource.
+- Validation of access keys are done for each client to server request.
+- Request and response sent back and forth depends on the **grant-types**
+
+### OAuth Grant-Types
+- OAuth 2 provides several "grant types" for different use cases. The grant types defined are:
+- **Authorization Code** for apps running on a web server, browser-based and mobile apps
+- **Password** for logging in with a username and password (only for first-party apps)
+- **Client credentials** for application access without a user present
+- **Implicit** was previously recommended for clients without a secret, but has been superseded by using the Authorization Code grant with PKCE.
+
+> OAuth Grant Types are explained in the Markdown OAuth_Explained.md
+
+
+
