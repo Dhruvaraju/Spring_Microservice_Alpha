@@ -289,4 +289,79 @@ public class AppCoontroller {
 - We can also add a specific origin as ``` @CrossOrigin("http://myapp.site") ```
 - GLobal CORS can be enabled by using the ``` WebMvcConfigurer ``` bean, and customizing the ``` addCorsMapping(CorsRegistry registry method) ```
 
+### Actuators for microservice instrumentation
+- Actuators provide out of the box mechanism for monitoring and managing spring boot microservices in production.
+- Create a spring starter project with spring web, Spring HAL, Spring Hateoas.
+- Add ``` management.endpoints.web.exposure.include=* ``` in application.properties
+- Actuator endpoints will be exposed on the URI ``` /actuator ``` in the example project it will be ``` http://localhost:9092/actuator ```
+- Metrics can be accessed from Jconsole as well.
+
+### Creating a custom health Module
+- Can be done by overriding the methods in ``` HealthIndicator ```
+- Create a counter class to count the number of hits for a service.
+- Create a health indicator class, which will implement the health method from health-indicator.
+```
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.stereotype.Component;
+
+@Component
+public class HealthMonitor implements HealthIndicator {
+	
+	TPSCounter counter;
+	
+	public Health health() {
+		boolean health = counter.isWeak();
+		if(health) {
+			return Health.outOfService().withDetail("Number of Hits were High", counter.count.toString()).build();
+		}
+		return Health.up().build();
+	}
+	
+	//To increase the service hits after every call is made
+	public void updateTx() {
+		if(counter == null || counter.isExpired()) {
+			counter = new TPSCounter();
+		}
+		counter.increment();
+	}
+}
+```
+- TPS counter should be able to deal with the increment of the counter every time service is invoke.
+
+```
+import java.util.Calendar;
+import java.util.concurrent.atomic.LongAdder;
+
+public class TPSCounter {
+	LongAdder count;
+	int maxServiceHits = 2;
+	Calendar expiry = null;
+	
+	TPSCounter(){
+		this.count = new LongAdder();
+		this.expiry = Calendar.getInstance();
+		this.expiry.add(Calendar.MINUTE, 1);
+	}
+	
+	boolean isExpired() {
+		return Calendar.getInstance().after(expiry);
+	}
+	
+	boolean isWeak() {
+		return (count.intValue() > maxServiceHits);
+	}
+
+	//Everytime the method is invoked the count will increase by 1
+	void increment() {
+		count.increment();
+	}
+}
+
+> Health status can be checcked by the URI /actuator/health
+> After the max hit is reached, the health will reach to out of service.
+
+```
+
+
 
