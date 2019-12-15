@@ -267,6 +267,26 @@ spring.security.user.password=alpha
 - **Implicit** was previously recommended for clients without a secret, but has been superseded by using the Authorization Code grant with PKCE.
 
 > OAuth Grant Types are explained in the Markdown OAuth_Explained.md
+******************************************************************************************************************
+> OAuth2 examples need to be revisited
+******************************************************************************************************************
 
+### Enable Cross origin for Microservice Interaction
+- Browsers generally restrict client-side applications to fetch data from another server or domain.
+- Enabling cross origin access is generally termed as **CORS (Cross Origin Resource Sharing)**
+- Spring boot allows this by an annotation ``` @CrossOrigin ```
+
+```
+@RestController
+public class AppCoontroller {
+	@CrossOrigin
+	@GetMapping("/")
+	public Greet displayMessage() {
+		return new Greet("Hi There");
+	}
+}
+```
+- We can also add a specific origin as ``` @CrossOrigin("http://myapp.site") ```
+- GLobal CORS can be enabled by using the ``` WebMvcConfigurer ``` bean, and customizing the ``` addCorsMapping(CorsRegistry registry method) ```
 
 
